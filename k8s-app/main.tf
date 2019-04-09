@@ -18,10 +18,10 @@ resource "kubernetes_service" "default" {
     }
 
     port {
-      name        = "http"
+      name        = "tcp"
       protocol    = "TCP"
-      port        = 80
-      target_port = 8000
+      port        = 110
+      target_port = 5000
       node_port   = "${var.node_port}"
     }
   }
@@ -50,7 +50,7 @@ resource "kubernetes_replication_controller" "default" {
 
     template {
       container {
-        image = "gcr.io/${var.project_id}/morse-app:latest"
+        image = "gcr.io/${var.project_id}/morse-socket:latest"
         name  = "morse-app"
 
         resources {
