@@ -62,28 +62,9 @@ variable backend_params {
 
 variable backend_protocol {
   description = "The protocol with which to talk to the backend service"
-  default     = "HTTP"
+  default     = "TCP"
 }
 
-variable create_url_map {
-  description = "Set to `false` if url_map variable is provided."
-  default     = true
-}
-
-variable url_map {
-  description = "The url_map resource to use. Default is to send all traffic to first backend."
-  default     = ""
-}
-
-variable http_forward {
-  description = "Set to `false` to disable HTTP port 80 forward"
-  default     = true
-}
-
-variable ssl {
-  description = "Set to `true` to enable SSL support, requires variable `ssl_certificates` - a list of self_link certs"
-  default     = false
-}
 
 variable private_key {
   description = "Content of the private SSL key. Required if `ssl` is `true` and `ssl_certificates` is empty."
