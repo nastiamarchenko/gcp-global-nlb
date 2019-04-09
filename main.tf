@@ -258,30 +258,30 @@ module "cluster3_app" {
 #  port           = "30000"
 #}  
   
-output "cluster1-name" {
-  value = "${var.region1_cluster_name}"
-}
+#output "cluster1-name" {
+#  value = "${var.region1_cluster_name}"
+#}
 
-output "cluster2-name" {
-  value = "${var.region2_cluster_name}"
-}
+#output "cluster2-name" {
+#  value = "${var.region2_cluster_name}"
+#}
 
-output "cluster3-name" {
-  value = "${var.region3_cluster_name}"
-}
+#output "cluster3-name" {
+#  value = "${var.region3_cluster_name}"
+#}
 
   
-output "cluster1-region" {
-  value = "${var.region1}"
-}
+#output "cluster1-region" {
+#  value = "${var.region1}"
+#}
 
-output "cluster2-region" {
-  value = "${var.region2}"
-}
+#output "cluster2-region" {
+#  value = "${var.region2}"
+#}
 
-output "cluster3-region" {
-  value = "${var.region3}"
-}
+#output "cluster3-region" {
+#  value = "${var.region3}"
+#}
   
   
 #output "load-balancer-ip" {
