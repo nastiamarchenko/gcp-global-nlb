@@ -13,68 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-resource "google_compute_global_forwarding_rule" "http" {
+     
+resource "google_compute_global_forwarding_rule" "tcp" {
   project    = "${var.project}"
-  count      = "${var.http_forward ? 1 : 0}"
   name       = "${var.name}"
-  target     = "${google_compute_target_http_proxy.default.self_link}"
+  target     = "${google_compute_target_tcp_proxy.default.self_link}"
   ip_address = "${google_compute_global_address.default.address}"
-  port_range = "80"
+  port_range = 110  #"${var.service_port}"
   depends_on = ["google_compute_global_address.default"]
-}
+  load_balancing_scheme = "EXTERNAL"
+}   
+     
+resource "google_compute_target_tcp_proxy" "default" {
+  project          = "${var.project}"
+  name             = "${var.name}"
+  session_affinity = "${var.session_affinity}"
 
-resource "google_compute_global_forwarding_rule" "https" {
-  project    = "${var.project}"
-  count      = "${var.ssl ? 1 : 0}"
-  name       = "${var.name}-https"
-  target     = "${google_compute_target_https_proxy.default.self_link}"
-  ip_address = "${google_compute_global_address.default.address}"
-  port_range = "443"
-  depends_on = ["google_compute_global_address.default"]
-}
-
+  health_checks = [
+    "${google_compute_health_check.default.name}",
+  ]
+}   
+   
+   
 resource "google_compute_global_address" "default" {
   project    = "${var.project}"
   name       = "${var.name}-address"
   ip_version = "${var.ip_version}"
 }
 
-# HTTP proxy when ssl is false
-resource "google_compute_target_http_proxy" "default" {
-  project = "${var.project}"
-  count   = "${var.http_forward ? 1 : 0}"
-  name    = "${var.name}-http-proxy"
-  url_map = "${element(compact(concat(list(var.url_map), google_compute_url_map.default.*.self_link)), 0)}"
-}
 
-# HTTPS proxy  when ssl is true
-resource "google_compute_target_https_proxy" "default" {
-  project          = "${var.project}"
-  count            = "${var.ssl ? 1 : 0}"
-  name             = "${var.name}-https-proxy"
-  url_map          = "${element(compact(concat(list(var.url_map), google_compute_url_map.default.*.self_link)), 0)}"
-  ssl_certificates = ["${compact(concat(var.ssl_certificates, google_compute_ssl_certificate.default.*.self_link))}"]
-}
-
-resource "google_compute_ssl_certificate" "default" {
-  project     = "${var.project}"
-  count       = "${(var.ssl && !var.use_ssl_certificates) ? 1 : 0}"
-  name_prefix = "${var.name}-certificate-"
-  private_key = "${var.private_key}"
-  certificate = "${var.certificate}"
-
-  lifecycle = {
-    create_before_destroy = true
-  }
-}
-
-resource "google_compute_url_map" "default" {
-  project         = "${var.project}"
-  count           = "${var.create_url_map ? 1 : 0}"
-  name            = "${var.name}-url-map"
-  default_service = "${google_compute_backend_service.default.0.self_link}"
-}
 
 resource "google_compute_backend_service" "default" {
   project         = "${var.project}"
@@ -84,18 +51,19 @@ resource "google_compute_backend_service" "default" {
   protocol        = "${var.backend_protocol}"
   timeout_sec     = "${element(split(",", element(var.backend_params, count.index)), 3)}"
   backend         = ["${var.backends["${count.index}"]}"]
-  health_checks   = ["${element(google_compute_http_health_check.default.*.self_link, count.index)}"]
+  health_checks   = ["${element(google_compute_health_check.default.*.self_link, count.index)}"]
   security_policy = "${var.security_policy}"
   enable_cdn      = "${var.cdn}"
 }
 
-resource "google_compute_http_health_check" "default" {
+
+resource "google_compute_health_check" "default" {
   project      = "${var.project}"
-  count        = "${length(var.backend_params)}"
-  name         = "${var.name}-backend-${count.index}"
-  request_path = "${element(split(",", element(var.backend_params, count.index)), 0)}"
-  port         = "${element(split(",", element(var.backend_params, count.index)), 2)}"
+  name         = "${var.name}-hc"
+  request_path = "/"
+  port         = "${var.service_port}"
 }
+
 
 # Create firewall rule for each backend in each network specified, uses mod behavior of element().
 resource "google_compute_firewall" "default-hc" {
