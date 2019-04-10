@@ -30,7 +30,7 @@ export PROJECT_ID=$(gcloud config get-value project)
 ## Create container image and push it to Google Container Registry
 
 ```
-cd ./morseapp/k8s-app
+cd ./gcp-morse-socket/k8s-app
 docker build -t gcr.io/${PROJECT_ID}/morse-socket .
 docker push gcr.io/${PROJECT_ID}/morse-socket
 ```
