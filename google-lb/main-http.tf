@@ -19,22 +19,44 @@ resource "google_compute_global_forwarding_rule" "tcp" {
   name       = "${var.name}"
   target     = "${google_compute_target_tcp_proxy.default.self_link}"
   ip_address = "${google_compute_global_address.default.address}"
-  port_range = 110  #"${var.service_port}"
+  port_range = "${var.service_port}"
   depends_on = ["google_compute_global_address.default"]
-  load_balancing_scheme = "EXTERNAL"
 }   
      
 resource "google_compute_target_tcp_proxy" "default" {
   project          = "${var.project}"
   name             = "${var.name}"
-  session_affinity = "${var.session_affinity}"
-
-  health_checks = [
-    "${google_compute_health_check.default.name}",
-  ]
+  proxy_header     = "PROXY_V1"
+  backend_service  = "${google_compute_backend_service.default.self_link}"
 }   
    
-   
+
+resource "google_compute_backend_service" "default" {
+  project         = "${var.project}"
+  count           = "${length(var.backend_params)}"
+  name            = "${var.name}-backend-${count.index}"
+  port_name       = "${element(split(",", element(var.backend_params, count.index)), 1)}"
+  protocol        = "TCP"
+  timeout_sec     = 10
+  backend         = ["${var.backends["${count.index}"]}"]
+  health_checks   = ["${element(google_compute_health_check.default.*.self_link, count.index)}"]
+  security_policy = "${var.security_policy}"
+}
+
+
+resource "google_compute_health_check" "default" {
+  name               = "health-check"
+  timeout_sec        = 1
+  check_interval_sec = 1
+
+  tcp_health_check {
+    port = "30000"
+    proxy_header = "PROXY_V1"
+  }
+}
+
+
+
 resource "google_compute_global_address" "default" {
   project    = "${var.project}"
   name       = "${var.name}-address"
@@ -42,27 +64,6 @@ resource "google_compute_global_address" "default" {
 }
 
 
-
-resource "google_compute_backend_service" "default" {
-  project         = "${var.project}"
-  count           = "${length(var.backend_params)}"
-  name            = "${var.name}-backend-${count.index}"
-  port_name       = "${element(split(",", element(var.backend_params, count.index)), 1)}"
-  protocol        = "${var.backend_protocol}"
-  timeout_sec     = "${element(split(",", element(var.backend_params, count.index)), 3)}"
-  backend         = ["${var.backends["${count.index}"]}"]
-  health_checks   = ["${element(google_compute_health_check.default.*.self_link, count.index)}"]
-  security_policy = "${var.security_policy}"
-  enable_cdn      = "${var.cdn}"
-}
-
-
-resource "google_compute_health_check" "default" {
-  project      = "${var.project}"
-  name         = "${var.name}-hc"
-  request_path = "/"
-  port         = "${var.service_port}"
-}
 
 
 # Create firewall rule for each backend in each network specified, uses mod behavior of element().
