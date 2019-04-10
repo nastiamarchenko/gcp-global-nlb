@@ -1,4 +1,4 @@
-# Kubernetes Engine Multi Cluster Load Balancing
+# Kubernetes Engine Multi Cluster TCP-proxy Load Balancing
 based on tutorial https://cloud.google.com/community/tutorials/modular-load-balancing-with-terraform
 
 ```
@@ -9,7 +9,7 @@ Enabled APIs: Kubernetes Engine API
 ## Clone the code 
 
 ```
-git clone https://github.com/nastiamarchenko/morseapp
+git clone https://github.com/nastiamarchenko/gcp-morse-socket
 ```
 
 ## Set up the environment
@@ -31,8 +31,8 @@ export PROJECT_ID=$(gcloud config get-value project)
 
 ```
 cd ./morseapp/k8s-app
-docker build -t gcr.io/${PROJECT_ID}/morse-app .
-docker push gcr.io/${PROJECT_ID}/morse-app
+docker build -t gcr.io/${PROJECT_ID}/morse-socket .
+docker push gcr.io/${PROJECT_ID}/morse-socket
 ```
 
 ## Run Terraform
