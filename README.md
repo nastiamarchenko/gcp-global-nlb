@@ -47,16 +47,10 @@ terraform apply "myplan"
 ## Testing
 
 1. Wait for the load balancer to be provisioned:
-
-```
-chmod +x ./test.sh
-./test.sh
-```
-
 2. Open the address of the load balancer:
 
 ```
-echo http://$(terraform output load-balancer-ip)
+telnet $(terraform output load-bailancer-ip) 110
 ```
 
 ## Cleanup
