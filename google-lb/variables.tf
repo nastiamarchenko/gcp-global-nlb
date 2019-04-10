@@ -96,3 +96,12 @@ variable cdn {
   description = "Set to `true` to enable cdn on backend."
   default     = "false"
 }
+
+variable service_port {
+  description = "TCP port your service is listening on."
+}
+
+variable session_affinity {
+  description = "How to distribute load. Options are `NONE`, `CLIENT_IP` and `CLIENT_IP_PROTO`"
+  default     = "NONE"
+}
