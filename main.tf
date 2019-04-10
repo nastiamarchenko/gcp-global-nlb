@@ -119,9 +119,9 @@ provider "kubernetes" {
 
 module "cluster1_app" {
   source      = "./k8s-app"
-  #external_ip = "${module.glb.external_ip}"
-  node_port   = 30000
+  external_ip = "${module.glb.external_ip}"
   project_id = "${var.project_id}"
+  node_port   = 30000
 
   providers = {
     kubernetes = "kubernetes.cluster1"
@@ -130,10 +130,9 @@ module "cluster1_app" {
 
 module "cluster2_app" {
   source      = "./k8s-app"
-  #external_ip = "${module.glb.external_ip}"
-  node_port   = 30000
+  external_ip = "${module.glb.external_ip}"
   project_id = "${var.project_id}"
-
+  node_port   = 30000
   providers = {
     kubernetes = "kubernetes.cluster2"
   }
@@ -141,149 +140,148 @@ module "cluster2_app" {
 
 module "cluster3_app" {
   source      = "./k8s-app"
-  #external_ip = "${module.glb.external_ip}"
-  node_port   = 30000
+  external_ip = "${module.glb.external_ip}"
   project_id = "${var.project_id}"
-
+  node_port   = 30000
   providers = {
     kubernetes = "kubernetes.cluster3"
   }
 }  
   
-#module "glb" {
-#  source            = "GoogleCloudPlatform/lb-http/google"
-#  version           = "1.0.10"
-#  name              = "gke-multi-regional"
-#  target_tags       = ["tf-gke-region1", "tf-gke-region2", "tf-gke-region3"]
-#  firewall_networks = ["${google_compute_network.default.name}"]
-#
-#  backends = {
-#    "0" = [
-#      {
-#        group = "${element(module.cluster1.instance_groups, 0)}"
-#      },
-#      {
-#        group = "${element(module.cluster1.instance_groups, 1)}"
-#      },
-#      {
-#        group = "${element(module.cluster1.instance_groups, 2)}"
-#      },
-#      {
-#        group = "${element(module.cluster2.instance_groups, 0)}"
-#      },
-#      {
-#        group = "${element(module.cluster2.instance_groups, 1)}"
-#      },
-#      {
-#        group = "${element(module.cluster2.instance_groups, 2)}"
-#      },
-#       {
-#        group = "${element(module.cluster3.instance_groups, 0)}"
-#      },
-#      {
-#        group = "${element(module.cluster3.instance_groups, 1)}"
-#      },
-#      {
-#        group = "${element(module.cluster3.instance_groups, 2)}"
-#      },
-#    ]
-#  }
+module "glb" {
+  source            = "./google-lb"
+  name              = "gke-multi-regional"
+  service_port      = "110"
+  target_tags       = ["tf-gke-region1", "tf-gke-region2", "tf-gke-region3"]
+  firewall_networks = ["${google_compute_network.default.name}"]
 
-#  backend_params = [
-#   // health check path, port name, port number, timeout seconds.
-#    "/,http,30000,10",
-#  ]
-#}
+  backends = {
+    "0" = [
+      {
+        group = "${element(module.cluster1.instance_groups, 0)}"
+      },
+      {
+        group = "${element(module.cluster1.instance_groups, 1)}"
+      },
+      {
+        group = "${element(module.cluster1.instance_groups, 2)}"
+      },
+      {
+        group = "${element(module.cluster2.instance_groups, 0)}"
+      },
+      {
+        group = "${element(module.cluster2.instance_groups, 1)}"
+      },
+      {
+        group = "${element(module.cluster2.instance_groups, 2)}"
+      },
+       {
+        group = "${element(module.cluster3.instance_groups, 0)}"
+      },
+      {
+        group = "${element(module.cluster3.instance_groups, 1)}"
+      },
+      {
+        group = "${element(module.cluster3.instance_groups, 2)}"
+      },
+    ]
+  }
 
-#module "cluster1_named_port_1" {
-#  source         = "github.com/danisla/terraform-google-named-ports"
-#  instance_group = "${element(module.cluster1.instance_groups, 0)}"
-#  name           = "http"
-#  port           = "30000"
-#}
+  backend_params = [
+   // health check path, port name, port number, timeout seconds.
+    "/,tcp,30000,10",
+  ]
+}
 
-#module "cluster1_named_port_2" {
-#  source         = "github.com/danisla/terraform-google-named-ports"
-#  instance_group = "${element(module.cluster1.instance_groups, 1)}"
-#  name           = "http"
-#  port           = "30000"
-#}
+module "cluster1_named_port_1" {
+  source         = "github.com/danisla/terraform-google-named-ports"
+  instance_group = "${element(module.cluster1.instance_groups, 0)}"
+  name           = "tcp"
+  port           = "30000"
+}
 
-#module "cluster1_named_port_3" {
-#  source         = "github.com/danisla/terraform-google-named-ports"
-#  instance_group = "${element(module.cluster1.instance_groups, 2)}"
-#  name           = "http"
-#  port           = "30000"
-#}
+module "cluster1_named_port_2" {
+  source         = "github.com/danisla/terraform-google-named-ports"
+  instance_group = "${element(module.cluster1.instance_groups, 1)}"
+  name           = "tcp"
+  port           = "30000"
+}
 
-#module "cluster2_named_port_1" {
-#  source         = "github.com/danisla/terraform-google-named-ports"
-#  instance_group = "${element(module.cluster2.instance_groups, 0)}"
-#  name           = "http"
-#  port           = "30000"
-#}
+module "cluster1_named_port_3" {
+  source         = "github.com/danisla/terraform-google-named-ports"
+  instance_group = "${element(module.cluster1.instance_groups, 2)}"
+  name           = "tcp"
+  port           = "30000"
+}
 
-#module "cluster2_named_port_2" {
-#  source         = "github.com/danisla/terraform-google-named-ports"
-#  instance_group = "${element(module.cluster2.instance_groups, 1)}"
-#  name           = "http"
-#  port           = "30000"
-#}
+module "cluster2_named_port_1" {
+  source         = "github.com/danisla/terraform-google-named-ports"
+  instance_group = "${element(module.cluster2.instance_groups, 0)}"
+  name           = "tcp"
+  port           = "30000"
+}
 
-#module "cluster2_named_port_3" {
-#  source         = "github.com/danisla/terraform-google-named-ports"
-#  instance_group = "${element(module.cluster2.instance_groups, 2)}"
-#  name           = "http"
-#  port           = "30000"
-#}
+module "cluster2_named_port_2" {
+  source         = "github.com/danisla/terraform-google-named-ports"
+  instance_group = "${element(module.cluster2.instance_groups, 1)}"
+  name           = "tcp"
+  port           = "30000"
+}
 
-#module "cluster3_named_port_1" {
-#  source         = "github.com/danisla/terraform-google-named-ports"
-#  instance_group = "${element(module.cluster3.instance_groups, 0)}"
-#  name           = "http"
-#  port           = "30000"
-#}
+module "cluster2_named_port_3" {
+  source         = "github.com/danisla/terraform-google-named-ports"
+  instance_group = "${element(module.cluster2.instance_groups, 2)}"
+  name           = "tcp"
+  port           = "30000"
+}
 
-#module "cluster3_named_port_2" {
-#  source         = "github.com/danisla/terraform-google-named-ports"
-#  instance_group = "${element(module.cluster3.instance_groups, 1)}"
-#  name           = "http"
-#  port           = "30000"
-#}
+module "cluster3_named_port_1" {
+  source         = "github.com/danisla/terraform-google-named-ports"
+  instance_group = "${element(module.cluster3.instance_groups, 0)}"
+  name           = "tcp"
+  port           = "30000"
+}
 
-#module "cluster3_named_port_3" {
-#  source         = "github.com/danisla/terraform-google-named-ports"
-#  instance_group = "${element(module.cluster3.instance_groups, 2)}"
-#  name           = "http"
-#  port           = "30000"
-#}  
+module "cluster3_named_port_2" {
+  source         = "github.com/danisla/terraform-google-named-ports"
+  instance_group = "${element(module.cluster3.instance_groups, 1)}"
+  name           = "tcp"
+  port           = "30000"
+}
+
+module "cluster3_named_port_3" {
+  source         = "github.com/danisla/terraform-google-named-ports"
+  instance_group = "${element(module.cluster3.instance_groups, 2)}"
+  name           = "tcp"
+  port           = "30000"
+}  
   
-#output "cluster1-name" {
-#  value = "${var.region1_cluster_name}"
-#}
+output "cluster1-name" {
+  value = "${var.region1_cluster_name}"
+}
 
-#output "cluster2-name" {
-#  value = "${var.region2_cluster_name}"
-#}
+output "cluster2-name" {
+  value = "${var.region2_cluster_name}"
+}
 
-#output "cluster3-name" {
-#  value = "${var.region3_cluster_name}"
-#}
+output "cluster3-name" {
+  value = "${var.region3_cluster_name}"
+}
 
   
-#output "cluster1-region" {
-#  value = "${var.region1}"
-#}
+output "cluster1-region" {
+  value = "${var.region1}"
+}
 
-#output "cluster2-region" {
-#  value = "${var.region2}"
-#}
+output "cluster2-region" {
+  value = "${var.region2}"
+}
 
-#output "cluster3-region" {
-#  value = "${var.region3}"
-#}
+output "cluster3-region" {
+  value = "${var.region3}"
+}
   
   
-#output "load-balancer-ip" {
-#  value = "${module.glb.external_ip}"
-#}
+output "load-bailancer-ip" {
+  value = "${module.glb.external_ip}"
+}
