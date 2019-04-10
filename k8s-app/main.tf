@@ -1,5 +1,5 @@
-#variable "external_ip" {}
-#variable "node_port" {}
+variable "external_ip" {}
+variable "node_port" {}
 variable "project_id" {}
 
 resource "kubernetes_service" "default" {
@@ -8,21 +8,21 @@ resource "kubernetes_service" "default" {
     name      = "morse-socket"
   }
 
-  #spec {
-  #  type             = "NodePort"
-  #  session_affinity = "ClientIP"
-  #  external_ips     = ["${var.external_ip}"]
+  spec {
+    type             = "NodePort"
+    session_affinity = "ClientIP"
+    external_ips     = ["${var.external_ip}"]
 
-   # selector {
-   #   run = "morse-app"
-   # }
+    selector {
+      run = "morse-socket"
+    }
 
     port {
       name        = "tcp"
       protocol    = "TCP"
       port        = 110
       target_port = 5000
-    #  node_port   = "${var.node_port}"
+      node_port   = "${var.node_port}"
     }
   }
 }
@@ -84,4 +84,6 @@ resource "kubernetes_horizontal_pod_autoscaler" "default" {
     }
   }
 }
+
+
 
