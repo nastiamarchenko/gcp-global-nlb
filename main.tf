@@ -282,6 +282,6 @@ output "cluster3-region" {
 }
   
   
-output "load-bailancer-ip" {
+output "load-balancer-ip" {
   value = "${module.glb.external_ip}"
 }
