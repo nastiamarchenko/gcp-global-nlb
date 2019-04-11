@@ -1,12 +1,14 @@
 package main
 
-import (
+  import (
 	"fmt"
 	"io/ioutil"
 	"log"
 	"net"
 )
 
+
+func main() {
 ln, err := net.Listen("tcp", *addr)
 if err != nil {
 	log.Fatal(err)
@@ -29,4 +31,5 @@ for {
 	log.Printf("local address is: %v", pcn.LocalAddr())
 	log.Printf("proxy address is: %v", pcn.ProxyAddr())
 	pcn.Close()
+}
 }
