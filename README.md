@@ -50,7 +50,7 @@ terraform apply "myplan"
 2. Open the address of the load balancer:
 
 ```
-telnet $(terraform output load-bailancer-ip) 110
+telnet $(terraform output load-balancer-ip) 110
 ```
 
 ## Cleanup
