@@ -118,7 +118,7 @@ provider "kubernetes" {
 }
 
 module "cluster1_app" {
-  source      = "./k8s-app"
+  source      = "./golang"
   external_ip = "${module.glb.external_ip}"
   project_id = "${var.project_id}"
   node_port   = 30000
@@ -129,7 +129,7 @@ module "cluster1_app" {
 }
 
 module "cluster2_app" {
-  source      = "./k8s-app"
+  source      = "./golang"
   external_ip = "${module.glb.external_ip}"
   project_id = "${var.project_id}"
   node_port   = 30000
@@ -139,7 +139,7 @@ module "cluster2_app" {
 }
 
 module "cluster3_app" {
-  source      = "./k8s-app"
+  source      = "./golang"
   external_ip = "${module.glb.external_ip}"
   project_id = "${var.project_id}"
   node_port   = 30000
