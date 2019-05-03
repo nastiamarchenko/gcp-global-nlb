@@ -9,7 +9,7 @@ Enabled APIs: Kubernetes Engine API
 ## Clone the code 
 
 ```
-git clone https://github.com/nastiamarchenko/gcp-morse-socket
+git clone https://github.com/nastiamarchenko/gcp-global-nlb
 ```
 
 ## Set up the environment
